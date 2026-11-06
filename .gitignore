@@ -1,4 +1,4 @@
 *.out
 *.txt
 libft/
-tests/
+tests/libft

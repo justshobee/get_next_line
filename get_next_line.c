@@ -25,7 +25,7 @@ char	*line(char *buf, int nbyte, char *find, char **stash)
 
 	index = find - buf;
 	index++;
-	newstr = ft_substr(buf, 0, index + 1);
+	newstr = ft_substr(buf, 0, index);
 	if (ft_strlen(*stash) > 0)
 		newstr = ft_strjoin(stash, newstr);
 	if (ft_strlen(buf + index) > 0)
@@ -73,22 +73,24 @@ char	*get_next_line(int fd)
 {
 	static char	*stash;
 	int		nbyte;
-	char	*buf;
+	char	buf[BUFFER_SIZE + 1];
 	char	*s;
 
 	if (fd <= 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buf = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (buf == NULL)
-		return (NULL);
+	// buf = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	// if (buf == NULL)
+	// 	return (NULL);
 	nbyte = read(fd, buf, BUFFER_SIZE);
-	if (nbyte < 0)
+	buf[nbyte] = '\0';
+	if (nbyte < 0 || (nbyte == 0 && !stash))
 		return (NULL);
 	s = get_line(buf, nbyte, &stash);
 	while (s == NULL)
 	{
 		nbyte = read(fd, buf, BUFFER_SIZE);
-		if (nbyte < 0)
+		buf[nbyte] = '\0';
+		if (nbyte < 0 || (nbyte == 0 && !stash))
 			return (NULL);
 		s = get_line(buf, nbyte, &stash);
 	}

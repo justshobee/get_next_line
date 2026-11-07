@@ -38,7 +38,7 @@ char	*ft_substr(char *s, unsigned int start, size_t len)
 	return (str[i] = '\0', str);
 }
 
-char	*line(char *buf, int nbyte, char *find, char **stash)
+char	*line(char *buf, char *find, char **stash)
 {
 	char	*newstr;
 	char	*free_s;
@@ -63,26 +63,55 @@ char	*line(char *buf, int nbyte, char *find, char **stash)
 	return (newstr);
 }
 
+char	*check_stash(char **stash)
+{
+	char	*find;
+	char	*newstr;
+	int	index;
+
+	if (!(*stash))
+		return (NULL);
+	find = ft_strchr(*stash, '\n');
+	if (find != NULL)
+	{
+		index = find - (*stash);
+		newstr = ft_substr(*stash, 0, index + 1);
+		if (find[index + 1] == '\0')
+		{
+			free(*stash);
+			return (*stash = NULL, newstr);
+		}
+		find = *stash;
+		*stash = ft_strdup(find + index + 1);
+		return (free(find), newstr);
+	}
+	return (NULL);
+}
+
 char	*get_line(char *buf, int nbyte, char **stash)
 {
 	char	*find;
+	char	*line_stash;
 
-	if (nbyte == 0)
+	line_stash = check_stash(stash);
+	if (nbyte == 0 && line_stash == NULL)
 	{
 		if (!(*stash))
-			return (ft_strdup(buf));
+			return (NULL);
 		else
 			return (ft_strjoin(stash, buf));
 	}
 	find = ft_strchr(buf, '\n');
-	if (find != NULL)
-		return (line(buf, nbyte, find, stash));
+	if (find != NULL && line_stash == NULL)
+		return (line(buf, find, stash));
 	else
 	{
-		if (!(*stash))
+		if (!(*stash) && nbyte > 0)
 			*stash = ft_strdup(buf);
 		else
 			*stash = ft_strjoin(stash, buf);
+		if (line_stash != NULL)
+			return (line_stash);
 		return (NULL);
 	}
 }
@@ -112,17 +141,29 @@ char	*get_next_line(int fd)
 	return (s);
 }
 
-int		main()
-{
-	int fd = open("test.txt", O_RDONLY);
-	if (fd == -1)
-		printf("failing to open this file ==> [fd = %d]\n", fd);
-	char *s = NULL;
-	while ((s = get_next_line(fd)))
-	{
-		printf("%s", s);
-		free(s);
-	}
-	close(fd);
-	return (0);
-}
+// int		main()
+// {
+// 	int fd1 = open("test.txt", O_RDONLY);
+// 	if (fd1 == -1)
+// 		printf("failing to open this file ==> [fd = %d]\n", fd1);
+// 	char *s = NULL;
+// 	s = get_next_line(fd1);
+// 	printf("[%s]",s);
+// 	free(s);
+// 	s = get_next_line(fd1);
+// 	printf("[%s]",s);
+// 	free(s);
+// 	s = get_next_line(fd1);
+// 	printf("[%s]",s);
+// 	free(s);
+// 	s = get_next_line(fd1);
+// 	if (s == NULL)
+// 		printf("NULL\n");
+// 	else
+// 	{
+// 		printf("[%s]",s);
+// 		free(s);
+// 	}
+// 	close(fd1);
+// 	return (0);
+// }

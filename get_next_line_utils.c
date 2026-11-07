@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 #include "get_next_line.h"
 
-
 size_t	ft_strlen(char *s)
 {
 	size_t	i;
@@ -23,7 +22,6 @@ size_t	ft_strlen(char *s)
 		i++;
 	return (i);
 }
-
 
 void	*ft_memcpy(void *dest, void *src, size_t n)
 {
@@ -58,8 +56,8 @@ char	*ft_strjoin(char **s1, char *s2)
 		return (NULL);
 	ft_memcpy(s, *s1, s1len);
 	ft_memcpy(s + s1len, s2, s2len + 1);
-    free(*s1);
-    *s1 = NULL;
+	free(*s1);
+	*s1 = NULL;
 	return (s);
 }
 
@@ -96,62 +94,3 @@ char	*ft_strchr(const char *s, int c)
 		return ((char *)(s + i));
 	return (NULL);
 }
-
-char	*ft_substr(char *s, unsigned int start, size_t len)
-{
-	char	*str;
-	size_t	i;
-	size_t	slen;
-
-	if (!s)
-		return (NULL);
-	slen = ft_strlen(s);
-	if (start > slen)
-		start = slen;
-	slen = ft_strlen(s + start);
-	if (len > slen)
-		len = slen;
-	str = malloc(sizeof(char) * (len + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (i < len && s[start + i])
-	{
-		str[i] = s[start + i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-void	*ft_memset(void *s, int c, size_t n)
-{
-	size_t	i;
-
-	if (s == NULL)
-		return (NULL);
-	i = 0;
-	while (i < n)
-	{
-		*((unsigned char *)s + i) = (unsigned char)c;
-		i++;
-	}
-	return (s);
-}
-
-
-void	*ft_calloc(size_t n, size_t size)
-{
-	void	*add;
-
-	if (n == 0 || size == 0)
-		return (malloc(1));
-	if (n > SIZE_MAX / size)
-		return (NULL);
-	add = malloc(size * n);
-	if (!add)
-		return (NULL);
-	ft_memset(add, 0, n * size);
-	return (add);
-}
-

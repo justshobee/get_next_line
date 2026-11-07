@@ -12,22 +12,47 @@
 
 #include "get_next_line.h"
 
-//ft_strlen
-//ft_strjoin
-//ft_strdup
-//ft_substr
-//ft_strchr
+char	*ft_substr(char *s, unsigned int start, size_t len)
+{
+	char	*str;
+	size_t	i;
+	size_t	slen;
+
+	if (!s)
+		return (NULL);
+	slen = ft_strlen(s);
+	if (start > slen)
+		start = slen;
+	slen = ft_strlen(s + start);
+	if (len > slen)
+		len = slen;
+	str = malloc(sizeof(char) * (len + 1));
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (i < len && s[start + i])
+	{
+		str[i] = s[start + i];
+		i++;
+	}
+	return (str[i] = '\0', str);
+}
 
 char	*line(char *buf, int nbyte, char *find, char **stash)
 {
 	char	*newstr;
+	char	*free_s;
 	int		index;
 
 	index = find - buf;
 	index++;
 	newstr = ft_substr(buf, 0, index);
 	if (ft_strlen(*stash) > 0)
+	{
+		free_s = newstr;
 		newstr = ft_strjoin(stash, newstr);
+		free(free_s);
+	}
 	if (ft_strlen(buf + index) > 0)
 	{
 		if (!(*stash))
@@ -40,24 +65,18 @@ char	*line(char *buf, int nbyte, char *find, char **stash)
 
 char	*get_line(char *buf, int nbyte, char **stash)
 {
-	char	*s;
 	char	*find;
-	int		len;
-	int		index;
 
-	s = NULL;
-	len = 0;
 	if (nbyte == 0)
 	{
 		if (!(*stash))
-			return ft_strdup(buf);
+			return (ft_strdup(buf));
 		else
 			return (ft_strjoin(stash, buf));
 	}
 	find = ft_strchr(buf, '\n');
 	if (find != NULL)
 		return (line(buf, nbyte, find, stash));
-		// check stash if not empty join with the new string and return otherwise return newstr
 	else
 	{
 		if (!(*stash))
@@ -66,21 +85,17 @@ char	*get_line(char *buf, int nbyte, char **stash)
 			*stash = ft_strjoin(stash, buf);
 		return (NULL);
 	}
-		// check stash if not empty jjoinstr with newstr otherwise fill stash with newstr
-
 }
+
 char	*get_next_line(int fd)
 {
 	static char	*stash;
-	int		nbyte;
-	char	buf[BUFFER_SIZE + 1];
-	char	*s;
+	int			nbyte;
+	char		buf[BUFFER_SIZE + 1];
+	char		*s;
 
 	if (fd <= 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	// buf = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-	// if (buf == NULL)
-	// 	return (NULL);
 	nbyte = read(fd, buf, BUFFER_SIZE);
 	buf[nbyte] = '\0';
 	if (nbyte < 0 || (nbyte == 0 && !stash))
@@ -94,16 +109,16 @@ char	*get_next_line(int fd)
 			return (NULL);
 		s = get_line(buf, nbyte, &stash);
 	}
-	//get line
 	return (s);
 }
 
 int		main()
 {
 	int fd = open("test.txt", O_RDONLY);
-	
-	char *s;
-	while (s = get_next_line(fd))
+	if (fd == -1)
+		printf("failing to open this file ==> [fd = %d]\n", fd);
+	char *s = NULL;
+	while ((s = get_next_line(fd)))
 	{
 		printf("%s", s);
 		free(s);

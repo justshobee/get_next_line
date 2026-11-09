@@ -111,26 +111,24 @@ char	*get_next_line(int fd)
 	}
 	return (free(buf), buf = NULL, s);
 }
+// int	main(int argc, char **argv)
+// {
+// 	int		fd;
+// 	int		n;
+// 	char	*l;
+// 	char	*p;
 
-
-int	main(int argc, char **argv)
-{
-	int		fd;
-	int		n;
-	char	*l;
-	char	*p;
-
-	if (argc < 2)
-		return (1);
-	fd = open(argv[1], O_RDONLY);
-	n = 0;
-	while ((l = get_next_line(fd)))
-	{
-		printf("%d: ", ++n);
-		for (p = l; *p; p++)
-			putchar(*p == '\n' ? '$' : *p);
-		putchar('\n');
-		free(l);
-	}
-	return (0);
-}
+// 	if (argc < 2)
+// 		return (1);
+// 	fd = open(argv[1], O_RDONLY);
+// 	n = 0;
+// 	while ((l = get_next_line(fd)))
+// 	{
+// 		printf("%d: ", ++n);
+// 		for (p = l; *p; p++)
+// 			putchar(*p == '\n' ? '$' : *p);
+// 		putchar('\n');
+// 		free(l);
+// 	}
+// 	return (0);
+// }

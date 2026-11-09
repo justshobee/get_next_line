@@ -12,32 +12,6 @@
 
 #include "get_next_line.h"
 
-char	*ft_substr(char *s, unsigned int start, size_t len)
-{
-	char	*str;
-	size_t	i;
-	size_t	slen;
-
-	if (!s)
-		return (NULL);
-	slen = ft_strlen(s);
-	if (start > slen)
-		start = slen;
-	slen = ft_strlen(s + start);
-	if (len > slen)
-		len = slen;
-	str = malloc(sizeof(char) * (len + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (i < len && s[start + i])
-	{
-		str[i] = s[start + i];
-		i++;
-	}
-	return (str[i] = '\0', str);
-}
-
 char	*line(char *buf, char *find, char **stash)
 {
 	char	*newstr;
@@ -56,7 +30,7 @@ char	*line(char *buf, char *find, char **stash)
 	if (ft_strlen(buf + index) > 0)
 	{
 		if (!(*stash))
-			*stash = ft_strdup(buf + index);
+			*stash = ft_substr(buf + index, 0, ft_strlen(buf + index));
 		else
 			*stash = ft_strjoin(stash, buf + index);
 	}
@@ -67,7 +41,7 @@ char	*check_stash(char **stash)
 {
 	char	*find;
 	char	*newstr;
-	int	index;
+	int		index;
 
 	if (!(*stash))
 		return (NULL);
@@ -76,13 +50,13 @@ char	*check_stash(char **stash)
 	{
 		index = find - (*stash);
 		newstr = ft_substr(*stash, 0, index + 1);
-		if (find[index + 1] == '\0')
+		if (find[1] == '\0')
 		{
 			free(*stash);
 			return (*stash = NULL, newstr);
 		}
 		find = *stash;
-		*stash = ft_strdup(find + index + 1);
+		*stash = ft_substr(find + index + 1, 0, ft_strlen(find + index + 1));
 		return (free(find), newstr);
 	}
 	return (NULL);
@@ -91,10 +65,8 @@ char	*check_stash(char **stash)
 char	*get_line(char *buf, int nbyte, char **stash)
 {
 	char	*find;
-	char	*line_stash;
 
-	line_stash = check_stash(stash);
-	if (nbyte == 0 && line_stash == NULL)
+	if (nbyte == 0)
 	{
 		if (!(*stash))
 			return (NULL);
@@ -102,16 +74,14 @@ char	*get_line(char *buf, int nbyte, char **stash)
 			return (ft_strjoin(stash, buf));
 	}
 	find = ft_strchr(buf, '\n');
-	if (find != NULL && line_stash == NULL)
+	if (find != NULL)
 		return (line(buf, find, stash));
 	else
 	{
 		if (!(*stash) && nbyte > 0)
-			*stash = ft_strdup(buf);
+			*stash = ft_substr(buf, 0, ft_strlen(buf));
 		else
 			*stash = ft_strjoin(stash, buf);
-		if (line_stash != NULL)
-			return (line_stash);
 		return (NULL);
 	}
 }
@@ -120,50 +90,47 @@ char	*get_next_line(int fd)
 {
 	static char	*stash;
 	int			nbyte;
-	char		buf[BUFFER_SIZE + 1];
+	char		*buf;
 	char		*s;
 
-	if (fd <= 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	nbyte = read(fd, buf, BUFFER_SIZE);
-	buf[nbyte] = '\0';
-	if (nbyte < 0 || (nbyte == 0 && !stash))
+	s = check_stash(&stash);
+	if (s != NULL)
+		return (s);
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buf)
 		return (NULL);
-	s = get_line(buf, nbyte, &stash);
 	while (s == NULL)
 	{
 		nbyte = read(fd, buf, BUFFER_SIZE);
-		buf[nbyte] = '\0';
 		if (nbyte < 0 || (nbyte == 0 && !stash))
-			return (NULL);
+			return (free(buf), buf = NULL, free(stash), stash = NULL, NULL);
+		buf[nbyte] = '\0';
 		s = get_line(buf, nbyte, &stash);
 	}
-	return (s);
+	return (free(buf), buf = NULL, s);
 }
 
-// int		main()
-// {
-// 	int fd1 = open("test.txt", O_RDONLY);
-// 	if (fd1 == -1)
-// 		printf("failing to open this file ==> [fd = %d]\n", fd1);
-// 	char *s = NULL;
-// 	s = get_next_line(fd1);
-// 	printf("[%s]",s);
-// 	free(s);
-// 	s = get_next_line(fd1);
-// 	printf("[%s]",s);
-// 	free(s);
-// 	s = get_next_line(fd1);
-// 	printf("[%s]",s);
-// 	free(s);
-// 	s = get_next_line(fd1);
-// 	if (s == NULL)
-// 		printf("NULL\n");
-// 	else
-// 	{
-// 		printf("[%s]",s);
-// 		free(s);
-// 	}
-// 	close(fd1);
-// 	return (0);
-// }
+
+int	main(int argc, char **argv)
+{
+	int		fd;
+	int		n;
+	char	*l;
+	char	*p;
+
+	if (argc < 2)
+		return (1);
+	fd = open(argv[1], O_RDONLY);
+	n = 0;
+	while ((l = get_next_line(fd)))
+	{
+		printf("%d: ", ++n);
+		for (p = l; *p; p++)
+			putchar(*p == '\n' ? '$' : *p);
+		putchar('\n');
+		free(l);
+	}
+	return (0);
+}

@@ -56,25 +56,33 @@ char	*ft_strjoin(char **s1, char *s2)
 		return (NULL);
 	ft_memcpy(s, *s1, s1len);
 	ft_memcpy(s + s1len, s2, s2len + 1);
-	free(*s1);
-	*s1 = NULL;
-	return (s);
+	return (free(*s1), *s1 = NULL, s);
 }
 
-char	*ft_strdup(char *s)
+char	*ft_substr(char *s, unsigned int start, size_t len)
 {
-	char	*d;
-	int		size;
+	char	*str;
+	size_t	i;
+	size_t	slen;
 
 	if (!s)
 		return (NULL);
-	d = NULL;
-	size = ft_strlen(s);
-	d = malloc(sizeof(char) * (size + 1));
-	if (!d)
+	slen = ft_strlen(s);
+	if (start > slen)
+		start = slen;
+	slen = ft_strlen(s + start);
+	if (len > slen)
+		len = slen;
+	str = malloc(sizeof(char) * (len + 1));
+	if (!str)
 		return (NULL);
-	ft_memcpy(d, s, size + 1);
-	return (d);
+	i = 0;
+	while (i < len && s[start + i])
+	{
+		str[i] = s[start + i];
+		i++;
+	}
+	return (str[i] = '\0', str);
 }
 
 char	*ft_strchr(const char *s, int c)

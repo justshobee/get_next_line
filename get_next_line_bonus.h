@@ -22,12 +22,8 @@
 # define M_FD 1024
 #endif
 
-#include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
 
 
 char	*get_next_line(int fd);

@@ -6,20 +6,19 @@
 /*   By: mochoubi <mochoubi@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/05 11:56:39 by mochoubi          #+#    #+#             */
-/*   Updated: 2026/11/05 12:17:59 by mochoubi         ###   ########.fr       */
+/*   Updated: 2026/11/11 07:46:41 by mochoubi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-#ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
 
-#include <unistd.h>
-#include <stdlib.h>
-
+# include <unistd.h>
+# include <stdlib.h>
 
 char	*get_next_line(int fd);
 size_t	ft_strlen(char *s);

@@ -97,7 +97,7 @@ char	*get_next_line(int fd)
 	s = check_stash(stash + fd);
 	if (s != NULL)
 		return (s);
-	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	buf = malloc(sizeof(char) * ((size_t)BUFFER_SIZE + 1));
 	if (!buf)
 		return (free(stash[fd]), stash[fd] = NULL, NULL);
 	while (s == NULL)
@@ -109,39 +109,4 @@ char	*get_next_line(int fd)
 		s = get_line(buf, nbyte, stash + fd);
 	}
 	return (free(buf), buf = NULL, s);
-}
-
-void	print_line(int fd)
-{
-	int		n;
-	char	*l;
-	char	*p;
-	n = 0;
-	printf("fd[%d] ===> ", fd);
-	l = get_next_line(fd);
-	printf("%d: ", ++n);
-	for (p = l; *p; p++)
-		putchar(*p == '\n' ? '$' : *p);
-	putchar('\n');
-	free(l);
-}
-
-int	main(int argc, char **argv)
-{
-	int		fd, fd1;
-
-	if (argc < 2)
-		return (1);
-	fd = open(argv[1], O_RDONLY);
-	fd1 = open(argv[2], O_RDONLY);
-	
-	print_line(fd);
-	print_line(fd1);
-	print_line(fd);
-	print_line(fd1);
-	print_line(fd);
-	print_line(fd1);
-	print_line(fd);
-	print_line(fd1);
-	return (0);
 }
